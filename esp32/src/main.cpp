@@ -13,9 +13,8 @@ constexpr int GAS_THRESHOLD = 1000;
 constexpr float TEMP_THRESHOLD = 35.0;
 constexpr float HUM_THRESHOLD = 60.0;
 
-//------------------- MQTT ----------------------------
-const char* SSID = "Wokwi-GUEST"; //nama wifi
-const char* PASSWORD = ""; //password wifi
+const char* SSID = "Wokwi-GUEST"; 
+const char* PASSWORD = ""; 
 const char* MQTT_SERVER = "broker.hivemq.com";
 const int MQTT_PORT = 1883;
 
@@ -32,43 +31,36 @@ PubSubClient client(espClient);
 unsigned long lastMsg = 0;
 const long interval = 2000;
 unsigned long lastReconnectAttempt = 0;
-//------------------- MQTT ----------------------------
 
-//---------- konversi MQ2 analog ke PPM ---------------
 constexpr float MQ2_VCC = 3.3;
 constexpr float MQ2_RL = 5.0;
 constexpr float MQ2_CLEAN_AIR = 9.83;
 
-//dari grafik datasheet untuk CO2
 constexpr float MQ2_A = 36974.0;
 constexpr float MQ2_B = -3.109;
 
 float mq2R0 = 10.0;
 
-//ubah ke true kalau pake wokwi, ubah ke false kalau pake hardware beneran
 constexpr bool USE_WOKWI_TABLE = true;
 
-//khusus untuk wokwi
 constexpr int WOKWI_POINTS = 8;
 constexpr float WOKWI_MV[WOKWI_POINTS] = {1552.0, 2302.0, 2833.0, 2972.0, 3032.0, 3065.0, 3098.0, 3115.0};
 constexpr float WOKWI_PPM[WOKWI_POINTS] = {1.0, 10.0, 100.0, 400.0, 1000.0, 2000.0, 5000.0, 10000.0};
-//---------- konversi MQ2 analog ke PPM ---------------
 
-//----------------- inisialisasi function -----------------
-float mq2ReadMv(); //baca milivolt
-float mq2ReadRs(); //konvert ADC (analog digital current) ke voltase
-void calibrateMq2(); //kalibrasi resistansi MQ2 terhadap udara bersih
-float mq2ReadPpm(); //dapat nilai PPM buat real life
-float mq2ReadPpmWokwi(); //dapat nilai PPM buat simulasi wokwi
+float mq2ReadMv(); 
+float mq2ReadRs(); 
+void calibrateMq2(); 
+float mq2ReadPpm(); 
+float mq2ReadPpmWokwi(); 
 
 void setupWifi();
 bool reconnect();
 
 void relayOn();
 void relayOff();
-//----------------- inisialisasi function -----------------
 
-//setup & loop
+
+
 void setup() {
   Serial.begin(115200);
   delay(2000);
@@ -79,7 +71,7 @@ void setup() {
   relayOff();
 
   dhtSensor.setup(PIN_DHT22, DHTesp::DHT22);
-  if (!USE_WOKWI_TABLE) calibrateMq2(); //simpan MQ2 di udara bersih dulu selama ~1s (slider wokwi di kirikan)
+  if (!USE_WOKWI_TABLE) calibrateMq2(); 
 
   setupWifi();
 
@@ -122,7 +114,7 @@ void loop() {
     Serial.println("Data DHT22 tidak kebaca");
   }
   else {
-    // debugging
+    
     Serial.printf("Temp: %.1f C  Hum: %.1f %%  Gas: %.2f", suhu, kelembapan, gas);
     Serial.print("\n");
 
@@ -155,7 +147,7 @@ void loop() {
   }
 }
 
-//definisi function
+
 void relayOn() { digitalWrite(PIN_RELAY, HIGH); }
 void relayOff() { digitalWrite(PIN_RELAY, LOW); }
 
@@ -192,7 +184,7 @@ bool reconnect() {
 
 float mq2ReadMv() {
   float mV = 0.0;
-  //for loop buat kurangi noise
+
   for (int i = 0; i < 10; i++) {
     mV += analogReadMilliVolts(PIN_MQ2);
     delay(5);
@@ -208,7 +200,7 @@ float mq2ReadRs() {
 
 void calibrateMq2() {
   float rs = 0.0;
-  //for loop buat dapat baseline udara bersih
+
   for (int i = 0; i < 20; i++) {
     rs += mq2ReadRs();
     delay(50);
